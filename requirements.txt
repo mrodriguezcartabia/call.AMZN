@@ -1,0 +1,7 @@
+streamlit
+requests
+pandas
+pandas_market_calendars
+numpy
+matplotlib
+scipy
