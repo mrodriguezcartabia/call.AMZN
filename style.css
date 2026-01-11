@@ -1,0 +1,121 @@
+/* Importar la fuente Inter para total consistencia */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+/* 1. Fondo principal y transparencia */
+.stApp {
+    background-color: #0f172a;
+}
+
+/* 2. Estilo de "Card" para las métricas */
+[data-testid="stMetric"] {
+    background-color: rgba(30, 41, 59, 0.8) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 15px !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #DAA520 !important; /* Mantenemos el dorado para el precio por énfasis */
+    font-weight: 700 !important;
+}
+
+/* 3. Botones con el estilo de Gamma Solutions */
+div.stButton > button {
+    border-radius: 0.5rem !important;
+    text-transform: uppercase;
+    font-weight: 600 !important;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease !important;
+}
+
+div.stButton > button[kind="primary"] {
+    background-color: #5f6ac4 !important;
+    border: none !important;
+}
+
+div.stButton > button[kind="primary"]:hover {
+    background-color: #4f5aba !important;
+    box-shadow: 0 0 15px rgba(95, 106, 196, 0.4);
+}
+
+/* 4. Estilo para el Popover e Inputs */
+div[data-testid="stPopover"] > button {
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+/* 5. Ajustar el editor de datos (Data Editor) */
+[data-testid="stDataEditor"] {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px;
+}
+
+/* 6. Contenedor para alinear etiqueta y valor en la misma línea */
+.custom-metric-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    margin-bottom: 4px;
+}
+
+/* 7. Estilo de la etiqueta (izquierda) */
+.metric-label {
+    font-size: 0.9rem !important;
+    font-weight: 500;
+    color: #cbd5e0;
+}
+
+/* 8. Estilo del valor (derecha) */
+.metric-value-small {
+    font-size: 1rem !important;
+    font-weight: 700;
+    color: #B8860B; /* Color dorado para el precio */
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* 9. --- BOTÓN RESET PEQUEÑO --- */
+/* Reducimos el tamaño del texto específicamente para el botón con key 'btn-reset' */
+div.stButton > button[key="btn-reset"] {
+    height: 1.5rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+div.stButton > button[key="btn-reset"] p {
+    font-size: 10px !important;
+    color: #a0aec0 !important;
+}
+
+/* Ajustes generales de inputs para que todo sea más compacto */
+.stNumberInput div div input {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+}
+
+/* Quitar espacio extra de los captions */
+.stCaptionContainer {
+    margin-bottom: 10px !important;
+    font-size: 0.75rem !important;
+}
+/* 10. Tarjeta de ingreso manual centrada */
+.overlay-card-static {
+    background-color: #1e293b;
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid #B8860B;
+    margin-top: 15vh; /* La baja un poco del tope */
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    text-align: center;
+}
