@@ -48,6 +48,10 @@ texts = {
         "msg_error_api": "No connection to API Alpha Vantage",
         "msg_manual_price": "Please enter the price manually to continue.",
         "error_fred": "No connection to FRED",
+        "error_fred": "No connection to FRED",
+        "parar_precio": "Error connecting to Alpha Vantage. Please enter the price manually:",
+        "parar_tasa": "Error connecting to FRED. Please enter the rate manually:",
+        "dias": "Days",        
     },
     "es": {
         "title": "Valuador de Call de Oro",
@@ -80,7 +84,8 @@ texts = {
         "msg_manual_price": "Por favor, coloque el precio manualmente para continuar.",
         "error_fred": "Sin conexión con FRED",
         "parar_precio": "Error al conectar con Alpha vetage. Por favor, introduzca el precio manualmente:",
-        "parar_tasa": "Error al conectar con FRED. Por favor, introduzca la tasa manualmente:"
+        "parar_tasa": "Error al conectar con FRED. Por favor, introduzca la tasa manualmente:",
+        "dias": "Días",
     },
     "pt": {
         "title": "Valiador de Call de Ouro",
@@ -112,6 +117,10 @@ texts = {
         "msg_error_api": "Sem conexão com a API Alpha Vantage",
         "msg_manual_price": "Por favor, insira o preço manualmente para continuar.",
         "error_fred": "Sem conexão com a FRED",
+        "error_fred": "Sem conexão com a FRED",
+        "parar_precio": "Erro ao conectar com Alpha Vantage. Por favor, insira o preço manualmente:",
+        "parar_tasa": "Erro ao conectar com a FRED. Por favor, insira a taxa manualmente:",
+        "dias": "Dias",
     }
 }
 
@@ -148,17 +157,21 @@ def get_market_data_alpha():
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
         response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
         data = response.json()
-        if "GLOEBAL_QUOTE" in data:
+        if "GLOBAL_QUOTE" in data:
             # Obtenemos la fecha de cierre más reciente
-            ultima_fecha = list(data["GLOEBAL_QUOTE"].keys())[0]
-            precio_amzn = float(data["GLOEBAL_QUOTE"][ultima_fecha]["4. close"])
+            ultima_fecha = list(data["GLOBAL_QUOTE"].keys())[0]
+            precio_amzn = float(data["GLOBAL_QUOTE"]["05. price"])
             
             with open(cache_file, "w") as f:
                 f.write(str(precio_amzn))
             return precio_amzn
     except:
         pass
-    return parar_juego(t["parar_precio"])
+    if st.session_state.valor_temporal is None:
+        parar_juego(t["parar_precio"])
+    precio = st.session_state.valor_temporal
+    st.session_state.valor_temporal = None
+    return precio
 
 def get_fred_risk_free_rate():
     cache_file = "risk_free.txt"
@@ -186,9 +199,14 @@ def get_fred_risk_free_rate():
                 return float(val) / 100
     except:
         pass
-    return parar_juego(t["parar_tasa"])
+    if st.session_state.valor_temporal is None:
+        parar_juego(t["parar_tasa"])
+    precio = st.session_state.valor_temporal
+    st.session_state.valor_temporal = None
+    return precio
 
 def obtener_volatilidad():
+    pass
 
 
 def hallar_sigma_optimo(precios_mercado, strikes, S, r, T, beta, paso, param_a):
@@ -215,10 +233,10 @@ def parar_juego(cartel):
             </div>
         """, unsafe_allow_html=True)
       
-        valor_inicial = st.number_input(t["val_act"], value=None, placeholder="")        
+        valor_temporal = st.number_input(t["val_act"], value=None, placeholder="")        
         if st.button("ENTER", key="btn_start_manual", use_container_width=True, type="primary"):
-            if valor_inicial is not None and  valor_inicial > 0:
-                return valor_inicial
+            if valor_temporal is not None and  valor_temporal > 0:
+                st.session_state.valor_temporal = valor_temporal
                 st.rerun()
             else:
                 st.warning(t["msg_manual_price"])
@@ -243,13 +261,16 @@ def calcular_call(S, K, r, T, sigma, beta, paso, param_a):
     return np.exp(-r * T) * suma_binomial
 
 # --- ESTADO DE SESIÓN ---
-
+valor_paso_original = 0.1
+# Creamos una variable que sirve en caso de que falle la comunicación con Alpha v o FRED
+if 'valor_temporal' not in st.session_state:
+    st.session_state.valor_temporal = None
 if 'tiempo_total' not in st.session_state:
   st.session_state.tiempo_total = 1
-if 'valor_amzn' not in st.session_state:
+if 'precio_AMZN' not in st.session_state:
   st.session_state.precio_AMZN = get_market_data_alpha()
 if 'paso_val' not in st.session_state:
-  st.session_state.paso_val = 0.1
+  st.session_state.paso_val = valor_paso_original
 #if 'market_cache' not in st.session_state:
 #  st.session_state.market_cache = None
 if 'tasa_cache' not in st.session_state:
@@ -278,7 +299,7 @@ with col2:
 
 with col3:
     dias = st.number_input(t["dias"], value=1, step=1.0, min_value=1.0, max_value=365.0)
-    precio_accion = st.number_input(t["precio"], value=st.session_state.precio_AMZN, step=0.01, min_value=1.0)
+    precio_accion = st.number_input(t["val_act"], value=st.session_state.precio_AMZN, step=0.01, min_value=1.0)
     st.caption(f"{t['fuente_precio']} = {st.session_state.precio_AMZN}")
 
 herramientas, grafico = st.columns([1, 3])
@@ -298,7 +319,7 @@ with herramientas:
             st.rerun()
     with boton2:
         if st.button(t["reset"], key="btn-reset"):
-            st.session_state.paso_val = VALOR_PASO_ORIGINAL
+            st.session_state.paso_val = valor_paso_original
             st.rerun()
 
     # Botón para el cálculo      
@@ -306,7 +327,7 @@ with herramientas:
 
 # Calculamos
 tiempo_T = dias /365
-strike = round(precio_AMZN / 5) * 5
+strike = round(precio_accion / 5) * 5
 rango_strikes = np.arange(strike - 15, strike + 16, 5)
 if st.session_state.data_grafico is None or btn_recalcular:
     # Indicador de carga activo durante el proceso matemático
