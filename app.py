@@ -383,13 +383,7 @@ rango_strikes = np.arange(strike - 15, strike + 16, 5)
 
 herramientas, grafico = st.columns([1, 3])
 with herramientas:
-    st.markdown(f"""
-        <div class="custom-metric-container">
-            <span class="metric-label">{t["paso_temp"]}:</span>
-            <span class="metric-value-small">{st.session_state.paso_val:.8f}</span>
-        </div>
-    """, unsafe_allow_html=True)
-    st.text_input(label=t["paso_temp"], value=f"{st.session_state.paso_val:.6f}", disabled=True)
+    st.text_input(label=t["paso_temp"], value=f"{st.session_state.paso_val:.6f}", read_only=True)
 
     # Botones de paso temporal
     boton1, boton2 = st.columns([1, 1.5])
