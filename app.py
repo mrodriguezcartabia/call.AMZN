@@ -302,10 +302,10 @@ def optimizar_parametro(target_param, precios_mercado, strikes, S, r, T, sigma, 
         err = 0
         # Asignamos el valor de prueba al parámetro elegido
         p = {
-            "sigma": valor_test if target_param == "sigma" else sigma,
-            "beta": valor_test if target_param == "beta" else beta,
-            "alpha": valor_test if target_param == "alpha" else param_a,
-            "tasa": valor_test if target_param == "tasa" else r
+            "sigma": valor_test if target_param == "Sigma" else sigma,
+            "beta": valor_test if target_param == "Beta" else beta,
+            "alpha": valor_test if target_param == "Alpha" else param_a,
+            "tasa": valor_test if target_param == "Tasa" else r
         }
         
         for i in range(len(strikes)):
@@ -348,6 +348,8 @@ if 'precios_mercado' not in st.session_state:
 # Ahora iniciamos todas las variables que necesitamos para optimizar
 if 'variable_optimizada' not in st.session_state:
     st.session_state.variable_optimizada = None
+if 'resultado_opt' not in st.session_state:
+    st.session_state.resultado_opt = None
 if 'sigma_opt' not in st.session_state:
     st.session_state.sigma_opt = 0.0
 if 'beta_opt' not in st.session_state:
@@ -461,7 +463,7 @@ with herramientas:
 
     # Resultado del hallado
     valor_hallado = f"{st.session_state.resultado_opt:.5f}" if st.session_state.resultado_opt else ""
-    st.metric(label=f"{t["lbl_res"]} {var_activa.upper()}", value=st.session_state.resultado_opt)
+    #st.metric(label=f"{t["lbl_res"]} {var_activa.upper()}", value=st.session_state.resultado_opt)
 
 
 # Calculamos los valores del call
