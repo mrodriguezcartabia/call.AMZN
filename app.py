@@ -477,7 +477,6 @@ with herramientas:
     # Resultado del hallado
     variable = st.session_state.variable_optimizada if st.session_state.variable_optimizada else ""
     valor = f"{st.session_state.resultado_opt:.5f}" if st.session_state.resultado_opt else ""
-    st.metric(label=f"{variable}=", value=valor)
     st.markdown(f"""
         <div style="margin-bottom: 16px;">         
             <div style="
