@@ -455,7 +455,9 @@ with herramientas:
         st.rerun()
 
     # Resultado del hallado
-    st.metric(label=st.session_state.variable_optimizada, value=st.session_state.resultado_opt)
+    variable = st.session_state.variable_optimizada if st.session_state.variable_optimizada else ""
+    valor = f"{st.session_state.resultado_opt:5f}" if st.session_state.resultado_opt else ""
+    st.metric(label=variable, value=valor)
 
 
 # Calculamos los valores del call
