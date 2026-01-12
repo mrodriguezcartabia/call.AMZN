@@ -441,11 +441,6 @@ with herramientas:
         if 'res_actual' not in st.session_state:
             st.session_state.res_actual = 0.0
     
-        st.metric(
-            label=f"Valor ajustado de {var_activa.upper()}", 
-            value=f"{st.session_state.res_actual:.5f}"
-        )
-    st.info(t["seleccionar"])
     b1, b2, b3, b4 = st.columns(4)
     with b1:
         if st.button("Alpha", use_container_width=True):
@@ -465,8 +460,8 @@ with herramientas:
         st.rerun()
 
     # Resultado del hallado
-    #valor_hallado = f"{st.session_state.sigma_hallado:.5f}" if st.session_state.sigma_hallado else ""
-    #st.metric(label=f"{t["lbl_res"]} {var_activa.upper()}", value=st.session_state.resultado_opt)
+    valor_hallado = f"{st.session_state.resultado_opt:.5f}" if st.session_state.resultado_opt else ""
+    st.metric(label=f"{t["lbl_res"]} {var_activa.upper()}", value=st.session_state.resultado_opt:4f)
 
 
 # Calculamos los valores del call
