@@ -315,10 +315,10 @@ def optimizar_parametro(target_param, precios_mercado, strikes, S, r, T, sigma, 
 
     # Definimos rangos lógicos según el parámetro
     bounds = {
-        "sigma": (0.01, 3.0),
-        "beta": (0.01, 10.0),
-        "alpha": (0.1, 5.0),
-        "tasa": (0.0, 2.0)
+        "Sigma": (0.01, 3.0),
+        "Beta": (0.01, 10.0),
+        "Alpha": (0.1, 5.0),
+        "Tasa": (0.0, 2.0)
     }
     
     res = minimize_scalar(error_cuadratico, bounds=bounds[target_param], method='bounded')
@@ -457,13 +457,13 @@ with herramientas:
         if st.button(t["tasa_lbl"], use_container_width=True):
             st.session_state.variable_optimizada = t["tasa_lbl"]
     # Botón para optimizar
-    if st.button(t["lbl_hallar"], type="primary", use_container_width=True) and any(p > 0 for p in st.session_state.precios_mercado) and st.session_state.variable_optimizada is not None:
-        st.session_state.resultado_opt = optimizar_parametro(st.session_state.variable_optimizada, st.session_state.precios_mercado, rango_strikes, precio_accion, tasa_r, tiempo_T, sigma, beta, st.session_state.paso_val, param_a)
+    if st.button(t["lbl_hallar"], type="primary", use_container_width=True) and any(p > 0 for p in st.session_state.precios_mercado) and st.session_state.variable_optimizada:
+        st.session_state.resultado_opt = optimizar_parametro(st.session_state.variable_optimizada, st.session_state.precios_mercado, rango_strikes, precio_accion, tasa_r, 
+                                                             tiempo_T, sigma, beta, st.session_state.paso_val, param_a)
         st.rerun()
 
     # Resultado del hallado
-    valor_hallado = f"{st.session_state.resultado_opt:.5f}" if st.session_state.resultado_opt else ""
-    #st.metric(label=f"{t["lbl_res"]} {var_activa.upper()}", value=st.session_state.resultado_opt)
+    st.metric(label=t["lbl_res"], value=st.session_state.resultado_opt)
 
 
 # Calculamos los valores del call
