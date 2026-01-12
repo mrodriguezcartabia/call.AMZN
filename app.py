@@ -384,24 +384,27 @@ rango_strikes = np.arange(strike - 15, strike + 16, 5)
 herramientas, grafico = st.columns([1, 3])
 with herramientas:
     st.markdown(f"""
-        <div style="
-            background-color: rgba(255, 255, 255, 0.05); 
-            padding: 10px; 
-            border-radius: 5px; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 10px;">
+        <div style="margin-bottom: 16px;">
             <div style="
-                color: #fafafa; 
-                font-size: 0.8rem; 
-                margin-bottom: 4px;">
-                {t["paso_temp"]}{st.session_state.paso_val:.6f}
+                color: #cbd5e0; 
+                font-size: 0.9rem; 
+                font-weight: 500; 
+                margin-bottom: 8px;">
+                {t["paso_temp"]}
             </div>
+            
             <div style="
+                height: 42px;
+                background-color: #1e293b; 
                 color: #fafafa; 
-                font-size: 1.2rem; 
-                font-weight: 500;
-                font-family: monospace;">
-                {st.session_state.paso_val:.6f}
+                padding: 0px 12px; 
+                border: 1px solid rgba(255, 255, 255, 0.2); 
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                font-size: 1rem;
+                font-family: 'Inter', sans-serif;">
+                {st.session_state.paso_val:.8f}
             </div>
         </div>
     """, unsafe_allow_html=True)
