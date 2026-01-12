@@ -394,7 +394,7 @@ with herramientas:
     # Botones de paso temporal
     boton1, boton2 = st.columns([1, 1.5])
     with boton1:
-        if st.button("x10⁻¹") and st.session_state.paso_val > 10^(-5):
+        if st.button("x10⁻¹") and st.session_state.paso_val > 10**(-5):
             st.session_state.paso_val *= 0.1
             st.rerun()
     with boton2:
