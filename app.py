@@ -49,6 +49,7 @@ texts = {
         "error_fred": "No connection to FRED",
         "parar_precio": "Error connecting to Alpha Vantage. Please enter the price manually:",
         "parar_tasa": "Error connecting to FRED. Please enter the rate manually:",
+        "parar_sigma": "Error connecting to Alpha Vantage. Please enter the volatility manually:",
         "dias": "Days",        
     },
     "es": {
@@ -83,6 +84,7 @@ texts = {
         "error_fred": "Sin conexión con FRED",
         "parar_precio": "Error al conectar con Alpha vetage. Por favor, introduzca el precio manualmente:",
         "parar_tasa": "Error al conectar con FRED. Por favor, introduzca la tasa manualmente:",
+        "parar_sigma": "Error al conectar con Alpha vetage. Por favor, introduzca la volatilidad anual manualmente:",
         "dias": "Días",
     },
     "pt": {
@@ -118,6 +120,7 @@ texts = {
         "error_fred": "Sem conexão com a FRED",
         "parar_precio": "Erro ao conectar com Alpha Vantage. Por favor, insira o preço manualmente:",
         "parar_tasa": "Erro ao conectar com a FRED. Por favor, insira a taxa manualmente:",
+        "parar_sigma": "Erro ao conectar com a Alpha Vantage. Por favor, insira a volatilidade anual manualmente:",
         "dias": "Dias",
     }
 }
@@ -201,7 +204,41 @@ def get_fred_risk_free_rate():
     st.session_state.valor_temporal = None
     return precio
 
-#def obtener_volatilidad():
+def get_volatility_data_alpha():
+    cache_file = "volatility_data.txt"
+    # Leamos el archivo
+    if os.path.exists(cache_file):
+        file_age = time.time() - os.path.getmtime(cache_file)
+        if file_age < 72000:
+            try:
+                with open(cache_file, "r") as f:
+                    cached_file = float(f.read())
+                return cached_file
+            except:
+                pass
+    # Buscamos en la web
+    try:
+        api_key = st.secrets["ALPHAVANTAGE_API_KEY"]  
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
+        response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
+        data = response.json()
+        if "Time Series (Daily)" in data:
+            # Extraer precios de cierre
+            df = pd.DataFrame.from_dict(data['Time Series (Daily)'], orient='index')
+            df = df['4. close'].astype(float).sort_index()
+            log_returns = np.log(df / df.shift(1)).dropna() # 1. Calcular rendimientos logarítmicos
+            sigma_diario = log_returns.std() # 2. Desviación estándar diaria
+            sigma_anual = sigma_diario * np.sqrt(252) # 3. Anualizar (252 días de trading)
+            with open(cache_file, "w") as f:
+                f.write(str(sigma_anual))
+            return sigma_anual
+    except:
+        pass
+    if st.session_state.valor_temporal is None:
+        parar_juego(t["parar_sigma"])
+    sigma_anual = st.session_state.valor_temporal
+    st.session_state.valor_temporal = None
+    return sigma_anual            
 
 def hallar_sigma_optimo(precios_mercado, strikes, S, r, T, beta, paso, param_a):
     def error_cuadratico(sigma_test):
@@ -226,14 +263,15 @@ def parar_juego(cartel):
                 <p style="color: white; text-align: center;">{cartel}</p>
             </div>
         """, unsafe_allow_html=True)
-      
-        valor_temporal = st.number_input(t["val_act"], value=None, placeholder="")        
-        if st.button("ENTER", key="btn_start_manual", use_container_width=True, type="primary"):
-            if valor_temporal is not None and  valor_temporal > 0:
-                st.session_state.valor_temporal = valor_temporal
-                st.rerun()
-            else:
-                st.warning(t["msg_manual_price"])
+        with st.form(key="manual_input_form", clear_on_submit=True):
+            valor_temporal = st.number_input(t["val_act"], value=None, placeholder="")
+            submit_button = st.form_submit_button("ENTER", use_container_width=True, type="primary")
+            if submit_button:
+                if valor_temporal is not None and  valor_temporal > 0:
+                    st.session_state.valor_temporal = valor_temporal
+                    st.rerun()
+                else:
+                    st.warning(t["msg_manual_price"])
         st.stop()
 
 @st.cache_data
@@ -272,26 +310,25 @@ if 'data_grafico' not in st.session_state:
 if 'mostrar_editor' not in st.session_state:
   st.session_state.mostrar_editor = False
 if 'sigma_hallado' not in st.session_state:
-  st.session_state.sigma_hallado = None
+  st.session_state.sigma_hallado = get_volatility_data_alpha()
 if 'precios_mercado' not in st.session_state:
   st.session_state.precios_mercado = [0.0] * 7
 
 # --- INTERFAZ ---
 col1, col2, col3 = st.columns(3)
 with col1:
-    param_a_def = 1.0
-    param_a = st.number_input(t["alpha_lbl"], value=param_a_def, step=0.01, min_value=0.1, max_value=10.0)
-    sigma_def = 0.16
-    sigma = st.number_input(t["sigma_lbl"], value=sigma_def, format="%.2f", min_value=0.1, max_value=2.0)
+    param_a = st.number_input(t["alpha_lbl"], value=1.0, step=0.01, min_value=0.1, max_value=10.0)
+    sigma = st.number_input(t["sigma_lbl"], value=float(st.session_state.sigma_hallado), format="%.2f", min_value=0.001, max_value=3.0)
+    st.caption(f"{t['fuente_precio']} = {st.session_state.sigma_hallado}")
 
 with col2:
     beta = st.number_input("Beta", value=0.5, step=0.01, min_value=0.0, max_value=10.0)
-    tasa_r = st.number_input(t["tasa_lbl"], value=st.session_state.tasa_cache, format="%.4f", min_value=0.0, max_value=10.0)
+    tasa_r = st.number_input(t["tasa_lbl"], value=float(st.session_state.tasa_cache), format="%.4f", min_value=0.0, max_value=10.0)
     st.caption(f"{t['fuente_tasa']} = {st.session_state.tasa_cache}")
 
 with col3:
     dias = st.number_input(t["dias"], value=1.0, step=1.0, min_value=1.0, max_value=365.0)
-    precio_accion = st.number_input(t["val_act"], value=st.session_state.precio_AMZN, step=0.01, min_value=1.0)
+    precio_accion = st.number_input(t["val_act"], value=float(st.session_state.precio_AMZN), step=0.01, min_value=1.0)
     st.caption(f"{t['fuente_precio']} = {st.session_state.precio_AMZN}")
 
 herramientas, grafico = st.columns([1, 3])
