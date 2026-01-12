@@ -11,7 +11,8 @@ from datetime import datetime
 from scipy.special import comb
 from scipy.optimize import minimize_scalar
 
-# Debe estar al comienzo
+# --- CONFIGURACIÓN DE PÁGINA ---
+st.set_page_config(page_title=t["title"], layout="wide")
 
 # --- LÓGICA DE IDIOMA ---
 params = st.query_params
@@ -126,10 +127,7 @@ texts = {
 
 t = texts.get(idioma, texts["en"])
 
-# --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title=t["title"], layout="wide")
-
-# Funciones
+# FUNCIONES
 def local_css(file_name):
     try:
         with open(file_name) as f:
@@ -292,7 +290,7 @@ with col2:
     st.caption(f"{t['fuente_tasa']} = {st.session_state.tasa_cache}")
 
 with col3:
-    dias = st.number_input(t["dias"], value=1, step=1.0, min_value=1.0, max_value=365.0)
+    dias = st.number_input(t["dias"], value=1.0, step=1.0, min_value=1.0, max_value=365.0)
     precio_accion = st.number_input(t["val_act"], value=st.session_state.precio_AMZN, step=0.01, min_value=1.0)
     st.caption(f"{t['fuente_precio']} = {st.session_state.precio_AMZN}")
 
