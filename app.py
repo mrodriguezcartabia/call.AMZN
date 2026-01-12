@@ -392,8 +392,7 @@ with herramientas:
                 font-weight: 500; 
                 margin-bottom: 8px;">
                 {t["paso_temp"]}
-            </div>
-            
+            </div>            
             <div style="
                 height: 42px;
                 background-color: #1e293b; 
