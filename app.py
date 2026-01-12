@@ -155,12 +155,10 @@ def get_market_data_alpha():
     try:
         api_key = st.secrets["ALPHAVANTAGE_API_KEY"]  
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
-        response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
+        response = requests.get(f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
         data = response.json()
-        if "GLOBAL_QUOTE" in data:
-            # Obtenemos la fecha de cierre más reciente
-            ultima_fecha = list(data["GLOBAL_QUOTE"].keys())[0]
-            precio_amzn = float(data["GLOBAL_QUOTE"]["05. price"])
+        if "Global Quote" in data and "05. price" in data["Global Quote"]:
+            precio_amzn = float(data["Global Quote"]["05. price"])
             
             with open(cache_file, "w") as f:
                 f.write(str(precio_amzn))
@@ -205,9 +203,7 @@ def get_fred_risk_free_rate():
     st.session_state.valor_temporal = None
     return precio
 
-def obtener_volatilidad():
-    pass
-
+#def obtener_volatilidad():
 
 def hallar_sigma_optimo(precios_mercado, strikes, S, r, T, beta, paso, param_a):
     def error_cuadratico(sigma_test):
@@ -271,8 +267,6 @@ if 'precio_AMZN' not in st.session_state:
   st.session_state.precio_AMZN = get_market_data_alpha()
 if 'paso_val' not in st.session_state:
   st.session_state.paso_val = valor_paso_original
-#if 'market_cache' not in st.session_state:
-#  st.session_state.market_cache = None
 if 'tasa_cache' not in st.session_state:
   st.session_state.tasa_cache = get_fred_risk_free_rate() 
 if 'data_grafico' not in st.session_state:
@@ -354,5 +348,8 @@ with grafico:
     ax.plot(strikes, calls, marker='o', color='#B8860B', linewidth=2)
     ax.fill_between(strikes, calls, alpha=0.1, color='#B8860B', label='Call')
 
-    
+    ax.set_xlabel("Strike")
+    ax.set_ylabel(t["graph_y"])
+    ax.grid(True, linestyle='--', alpha=0.6)
+    st.pyplot(fig)
 
