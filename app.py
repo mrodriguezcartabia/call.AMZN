@@ -391,17 +391,17 @@ with herramientas:
             border: 1px solid rgba(255, 255, 255, 0.2);
             margin-bottom: 10px;">
             <div style="
-                color: #bdc3c7; 
+                color: #cbd5e0; 
                 font-size: 0.8rem; 
                 margin-bottom: 4px;">
                 {t["paso_temp"]}
             </div>
             <div style="
-                color: white; 
+                color: #B8860B; 
                 font-size: 1.2rem; 
                 font-weight: 500;
                 font-family: monospace;">
-                {st.session_state.paso_val:.8f}
+                {st.session_state.paso_val:.6f}
             </div>
         </div>
     """, unsafe_allow_html=True)
