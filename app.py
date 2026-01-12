@@ -23,9 +23,9 @@ texts = {
         "sigma_lbl": "Sigma (Volatility)",
         "sigma_cap": "ℹ️ Conservative value based on past data",
         "alpha_lbl": "Alpha",
-        "fuente_precio": "ℹ️ Data from API Alpha Vantage",
+        "fuente_precio": "Data from API Alpha Vantage",
         "tasa_lbl": "Rate",
-        "fuente_tasa": "ℹ️ Source: FRED",
+        "fuente_tasa": "Data from FRED",
         "venc_msg": "Expires in {} days ({})",
         "val_act": "Current Price",
         "strike_atm": "Strike (At-the-money)",
@@ -60,9 +60,9 @@ texts = {
         "sigma_lbl": "Sigma (Volatilidad)",
         "sigma_cap": "ℹ️ Valor conservador basado en datos pasados",
         "alpha_lbl": "Alfa",
-        "fuente_precio": "ℹ️ Datos de API Alpha Vantage",
+        "fuente_precio": "Datos de API Alpha Vantage",
         "tasa_lbl": "Tasa",
-        "fuente_tasa": "ℹ️ Fuente: FRED",
+        "fuente_tasa": "Datos de FRED",
         "venc_msg": "Vencimiento en {} días ({})",
         "val_act": "Valor Actual",
         "strike_atm": "Strike At-the-money",
@@ -96,9 +96,9 @@ texts = {
         "sigma_lbl": "Sigma (Volatilidade)",
         "sigma_cap": "ℹ️ Valor conservador baseado em dados passados",
         "alpha_lbl": "Alfa",
-        "fuente_precio": "ℹ️ Dados da API Alpha Vantage",
+        "fuente_precio": "Dados da API Alpha Vantage",
         "tasa_lbl": "Taxa",
-        "fuente_tasa": "ℹ️ Fonte: FRED",
+        "fuente_tasa": "Dados da FRED",
         "venc_msg": "Expira em {} dias ({})",
         "val_act": "Preço Atual",
         "strike_atm": "Strike At-the-money",
@@ -404,7 +404,7 @@ with herramientas:
                 align-items: center;
                 font-size: 1rem;
                 font-family: 'Inter', sans-serif;">
-                {st.session_state.paso_val:.8f}
+                {st.session_state.paso_val:.6f}
             </div>
         </div>
     """, unsafe_allow_html=True)
