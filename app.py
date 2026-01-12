@@ -148,10 +148,10 @@ def get_market_data_alpha():
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
         response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
         data = response.json()
-        if "Time Series (Daily)" in data:
+        if "GLOEBAL_QUOTE" in data:
             # Obtenemos la fecha de cierre más reciente
-            ultima_fecha = list(data["Time Series (Daily)"].keys())[0]
-            precio_amzn = float(data["Time Series (Daily)"][ultima_fecha]["4. close"])
+            ultima_fecha = list(data["GLOEBAL_QUOTE"].keys())[0]
+            precio_amzn = float(data["GLOEBAL_QUOTE"][ultima_fecha]["4. close"])
             
             with open(cache_file, "w") as f:
                 f.write(str(precio_amzn))
@@ -216,14 +216,13 @@ def parar_juego(cartel):
         """, unsafe_allow_html=True)
       
         valor_inicial = st.number_input(t["val_act"], value=None, placeholder="")        
-        if st.button("ENTER", key="btn_start_manual", use_container_width=True, type="primary") or st.number.input(on_change):
+        if st.button("ENTER", key="btn_start_manual", use_container_width=True, type="primary"):
             if valor_inicial is not None and  valor_inicial > 0:
                 return valor_inicial
                 st.rerun()
             else:
                 st.warning(t["msg_manual_price"])
-    
-    st.stop()
+        st.stop()
 
 @st.cache_data
 def calcular_call(S, K, r, T, sigma, beta, paso, param_a):
@@ -265,9 +264,6 @@ if 'precios_mercado' not in st.session_state:
   st.session_state.precios_mercado = [0.0] * 7
 
 # --- INTERFAZ ---
-tiempo_T = dias /365
-strike = round(precio_AMZN / 5) * 5
-
 col1, col2, col3 = st.columns(3)
 with col1:
     param_a_def = 1.0
@@ -282,7 +278,7 @@ with col2:
 
 with col3:
     dias = st.number_input(t["dias"], value=1, step=1.0, min_value=1.0, max_value=365.0)
-    precio_AMZN = st.number_input(t["precio"], value=st.session_state.precio_AMZN, step=0.01, min_value=1.0)
+    precio_accion = st.number_input(t["precio"], value=st.session_state.precio_AMZN, step=0.01, min_value=1.0)
     st.caption(f"{t['fuente_precio']} = {st.session_state.precio_AMZN}")
 
 herramientas, grafico = st.columns([1, 3])
@@ -304,4 +300,38 @@ with herramientas:
         if st.button(t["reset"], key="btn-reset"):
             st.session_state.paso_val = VALOR_PASO_ORIGINAL
             st.rerun()
+
+    # Botón para el cálculo      
+    btn_recalcular = st.button(t["recalc"], type="primary", use_container_width=True)
+
+# Calculamos
+tiempo_T = dias /365
+strike = round(precio_AMZN / 5) * 5
+rango_strikes = np.arange(strike - 15, strike + 16, 5)
+if st.session_state.data_grafico is None or btn_recalcular:
+    # Indicador de carga activo durante el proceso matemático
+    with st.spinner(t['msg_loading']):
+        valores_c = []
+        for k in rango_strikes:
+            c = calcular_call(precio_accion, k, tasa_r, tiempo_T, sigma, beta, st.session_state.paso_val, param_a)
+            valores_c.append(c)
+        st.session_state.data_grafico = (rango_strikes, valores_c)
+    # Mensaje temporal de éxito
+    if btn_recalcular:
+        st.toast(t["msg_success"])
+
+# Graficamos
+with grafico:
+    strikes, calls = st.session_state.data_grafico
+
+    #st.subheader("Gráfico de Precio de Call (C) vs Strike (K)")
+    fig, ax = plt.subplots(figsize=(8, 3.5))
+    fig.patch.set_facecolor('#e2e8f0') 
+    ax.set_facecolor('#e2e8f0')
+    
+    # Curva del Modelo
+    ax.plot(strikes, calls, marker='o', color='#B8860B', linewidth=2)
+    ax.fill_between(strikes, calls, alpha=0.1, color='#B8860B', label='Call')
+
+    
 
