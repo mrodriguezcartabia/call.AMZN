@@ -537,7 +537,7 @@ with grafico:
         mode='lines+markers',
         line=dict(color='#FF9900', width=3),
         marker=dict(size=8),
-        hovertemplate='Strike: %{x:.2f}<br>t["graph_y"]: %{y:.2f}<extra></extra>'
+        hovertemplate='Strike: %{x:.2f}<br>{t["graph_y"]}: %{y:.2f}<extra></extra>'
     ))
     # Curva de valores de mercado
     if any(p > 0 for p in st.session_state.precios_mercado):
@@ -552,17 +552,34 @@ with grafico:
         ))
     # Estética
     fig.update_layout(
-        hovermode='x unified', # Muestra ambos valores al poner el cursor en el eje X
-        template='plotly_white',
+        hovermode='x unified',
+        template='plotly_white', # Esto pone el fondo blanco y letras negras
+        paper_bgcolor='rgba(0,0,0,0)', # Fondo exterior transparente para adaptarse a Streamlit
+        plot_bgcolor='white',          # Fondo interior blanco puro
         margin=dict(l=20, r=20, t=20, b=20),
         height=400,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        legend=dict(
+            orientation="h", 
+            yanchor="bottom", 
+            y=1.02, 
+            xanchor="right", 
+            x=1,
+            bgcolor='rgba(255,255,255,0.5)'
+        ),
         xaxis=dict(
             tickmode='array',
             tickvals=rango_strikes,
-            title="Strike"
+            title="Strike",
+            showgrid=True,
+            gridcolor='rgba(0,0,0,0.1)', # Cuadrícula suave
+            linecolor='black'            # Línea del eje negra
         ),
-        yaxis=dict(title=t["graph_y"])
+        yaxis=dict(
+            title=t["graph_y"],
+            showgrid=True,
+            gridcolor='rgba(0,0,0,0.1)', # Cuadrícula suave
+            linecolor='black'            # Línea del eje negra
+        )
     )
 
     # Mostrar en Streamlit
