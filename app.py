@@ -484,8 +484,6 @@ with herramientas:
     if st.button(t["lbl_hallar"], type="primary", use_container_width=True) and any(p > 0 for p in st.session_state.precios_mercado) and st.session_state.variable_optimizada:
         st.session_state.resultado_opt = optimizar_parametro(st.session_state.variable_optimizada, st.session_state.precios_mercado, rango_strikes, precio_accion, tasa_r, 
                                                              tiempo_T, sigma, beta, st.session_state.paso_val, param_a)
-        st.rerun()
-
     
 
     # Resultado del hallado
