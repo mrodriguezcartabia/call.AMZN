@@ -491,7 +491,7 @@ with herramientas:
     
 
     # Resultado del hallado
-    variable = st.session_state.variable_optimizada if st.session_state.variable_optimizada else "X"
+    variable = st.session_state.variable_optimizada if st.session_state.variable_optimizada else ""
     valor = f"{st.session_state.resultado_opt:.5f}" if st.session_state.resultado_opt else ""
     st.markdown(f"""
         <div style="margin-bottom: 16px;">         
