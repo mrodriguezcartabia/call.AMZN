@@ -27,7 +27,7 @@
 /* 3. Botones con el estilo de Gamma Solutions */
 div.stButton > button {
     border-radius: 0.5rem !important;
-    text-transform: uppercase;
+    text-transform: none;
     font-weight: 600 !important;
     letter-spacing: 0.05em;
     transition: all 0.3s ease !important;
