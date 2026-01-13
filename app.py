@@ -488,7 +488,7 @@ with herramientas:
         # Otro mensaje temporal de éxito
         if btn_hallar:
             st.toast(t["msg_success"])
-    st.rerun()
+    
 
     # Resultado del hallado
     variable = st.session_state.variable_optimizada if st.session_state.variable_optimizada else ""
