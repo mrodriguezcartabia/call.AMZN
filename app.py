@@ -492,23 +492,29 @@ with herramientas:
     variable = st.session_state.variable_optimizada if st.session_state.variable_optimizada else "x"
     valor = f"{st.session_state.resultado_opt:.5f}" if st.session_state.resultado_opt else ""
     st.markdown(f"""
-<div style="margin-bottom: 16px;">   
-<div style="
-height: 42px;
-background-color: #1e293b;
-color: #fafafa;
-padding: 0px 12px;
-border: 1px solid rgba(255, 255, 255, 0.2);
-border-radius: 0.5rem;
-display: flex;
-align-items: center;
-font-size: 1rem;
-font-family: 'Inter', sans-serif;">
-bla
-</div>
-</div>
-""", unsafe_allow_html=True)
-
+        <div style="margin-bottom: 16px;">
+            <div style="
+                color: #cbd5e0;
+                font-size: 0.9rem;
+                font-weight: 500;
+                margin-bottom: 8px;">
+                {t["paso_temp"]}
+            </div>
+            <div style="
+                height: 42px;
+                background-color: #1e293b;;
+                color: #fafafa;
+                padding: 0px 12px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                font-size: 1rem;
+                font-family: 'Inter', sans-serif;">
+                {st.session_state.paso_val:.6f}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 # Calculamos los valores del call
 if st.session_state.data_grafico is None or btn_recalcular:
