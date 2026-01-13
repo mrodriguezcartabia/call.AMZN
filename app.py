@@ -383,7 +383,7 @@ rango_strikes = np.arange(strike - 7.5, strike + 8, 2.5)
 if 'precios_mercado' not in st.session_state:
   st.session_state.precios_mercado = [0.0] * len(rango_strikes)
 
-herramientas, grafico = st.columns([1, 3])
+herramientas, grafico = st.columns([1, 2])
 with herramientas:
     st.markdown(f"""
         <div style="margin-bottom: 16px;">
