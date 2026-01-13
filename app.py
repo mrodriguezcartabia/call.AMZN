@@ -391,18 +391,18 @@ with herramientas:
     st.markdown(f"""
         <div style="margin-bottom: 16px;">
             <div style="
-                color: #cbd5e0; 
-                font-size: 0.9rem; 
-                font-weight: 500; 
+                color: #cbd5e0;
+                font-size: 0.9rem;
+                font-weight: 500;
                 margin-bottom: 8px;">
                 {t["paso_temp"]}
-            </div>            
+            </div>
             <div style="
                 height: 42px;
                 background-color: #1e293b; 
                 color: #fafafa; 
                 padding: 0px 12px; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
+                border: 1px solid rgba(255, 255, 255, 0.2);
                 border-radius: 0.5rem;
                 display: flex;
                 align-items: center;
@@ -412,6 +412,7 @@ with herramientas:
             </div>
         </div>
     """, unsafe_allow_html=True)
+    
 
     # Botones de paso temporal
     boton1, boton2 = st.columns([1, 1.5])
