@@ -494,13 +494,6 @@ with herramientas:
     st.markdown(f"""
         <div style="margin-bottom: 16px;">
             <div style="
-                color: #cbd5e0;
-                font-size: 0.9rem;
-                font-weight: 500;
-                margin-bottom: 8px;">
-                {t["paso_temp"]}
-            </div>
-            <div style="
                 height: 42px;
                 background-color: #1e293b;;
                 color: #fafafa;
