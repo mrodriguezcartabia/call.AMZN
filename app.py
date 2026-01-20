@@ -151,7 +151,7 @@ def get_market_data_alpha():
     # Leamos el archivo
     if os.path.exists(cache_file):
         file_age = time.time() - os.path.getmtime(cache_file)
-        if file_age < 7200:
+        if file_age < 2:#7200:
             try:
                 with open(cache_file, "r") as f:
                     cached_file = float(f.read())
