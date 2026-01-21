@@ -151,7 +151,7 @@ def get_market_data_alpha():
     # Leamos el archivo
     if os.path.exists(cache_file):
         file_age = time.time() - os.path.getmtime(cache_file)
-        if file_age < 7200:
+        if file_age < 14400:
             try:
                 with open(cache_file, "r") as f:
                     cached_file = float(f.read())
@@ -164,7 +164,7 @@ def get_market_data_alpha():
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
         response = requests.get(f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
         data = response.json()
-        with st.expander("Respuesta"):
+        with st.expander(t["msg_error_api"]):
             st.json(data)
         if "Global Quote" in data and "05. price" in data["Global Quote"]:
             precio = float(data["Global Quote"]["05. price"])
