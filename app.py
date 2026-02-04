@@ -162,7 +162,7 @@ def get_market_data_alpha():
     try:
         api_key = st.secrets["ALPHAVANTAGE_API_KEY"]  
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
-        response = requests.get(f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AMZN&apikey={api_key}", headers=headers, timeout=100)
+        response = requests.get(f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
         data = response.json()
         #with st.expander(t["msg_error_api"]):
         #    st.json(data)
