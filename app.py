@@ -147,38 +147,46 @@ def local_css(file_name):
 local_css("style.css")
 
 def get_market_data_alpha():
-    cache_file = "spot_price.txt"
+    cache_file = "market_price.json"
     # Leamos el archivo
     if os.path.exists(cache_file):
         file_age = time.time() - os.path.getmtime(cache_file)
-        if file_age < 21600:
+        if file_age < 21600: #6 horas
             try:
                 with open(cache_file, "r") as f:
-                    cached_file = float(f.read())
-                return cached_file
+                    data = json.load(f)
+                return data["precio"], data["sigma_anual"]
             except:
                 pass
     # Buscamos en la web
     try:
         api_key = st.secrets["ALPHAVANTAGE_API_KEY"]  
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
-        response = requests.get(f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
+        response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
         data = response.json()
         #with st.expander(t["msg_error_api"]):
         #    st.json(data)
-        if "Global Quote" in data and "05. price" in data["Global Quote"]:
-            precio = float(data["Global Quote"]["05. price"])
-            
+        if "Time Series (Daily)" in data:
+            # Extraer precios de cierre
+            df = pd.DataFrame.from_dict(data['Time Series (Daily)'], orient='index')
+            df = df['4. close'].astype(float).sort_index()
+            ultimo_precio = float(df.iloc[-1])
+            log_returns = np.log(df / df.shift(1)).dropna() # 1. Calcular rendimientos logarítmicos
+            sigma_diario = log_returns.std() # 2. Desviación estándar diaria
+            sigma_anual = sigma_diario * np.sqrt(252) # 3. Anualizar (252 días de trading)
             with open(cache_file, "w") as f:
-                f.write(str(precio))
-            return precio
+                json.dump({"precio": ultimo_precio, "sigma_anual": sigma_anual}, f)
+            return ultimo_precio, sigma_anual
     except:
         pass
     if st.session_state.valor_temporal is None:
         parar_juego(t["parar_precio"])
-    precio = st.session_state.valor_temporal
-    st.session_state.valor_temporal = None
-    return precio
+        precio = st.session_state.valor_temporal
+        st.session_state.valor_temporal = None
+        parar_juego(t["parar_sigma"])
+        sigma_anual = st.session_state.valor_temporal
+        st.session_state.valor_temporal = None
+    return precio, sigma_anual
 
 def get_fred_risk_free_rate():
     cache_file = "risk_free.txt"
@@ -334,23 +342,24 @@ def optimizar_parametro(target_param, precios_mercado, strikes, S, r, T, sigma, 
 
 # --- ESTADO DE SESIÓN ---
 valor_paso_original = 1.0
+valores_Alpha = get_market_data_alpha()
 # Creamos una variable que sirve en caso de que falle la comunicación con Alpha v o FRED
 if 'valor_temporal' not in st.session_state:
     st.session_state.valor_temporal = None
 if 'tiempo_total' not in st.session_state:
-  st.session_state.tiempo_total = 1.0
+    st.session_state.tiempo_total = 1.0
 if 'precio_AMZN' not in st.session_state:
-  st.session_state.precio_AMZN = get_market_data_alpha()
+    st.session_state.precio_AMZN = valores_Alpha[0]
 if 'paso_val' not in st.session_state:
-  st.session_state.paso_val = valor_paso_original
+    st.session_state.paso_val = valor_paso_original
 if 'tasa_cache' not in st.session_state:
-  st.session_state.tasa_cache = get_fred_risk_free_rate() 
+    st.session_state.tasa_cache = get_fred_risk_free_rate() 
 if 'data_grafico' not in st.session_state:
-  st.session_state.data_grafico = None
+    st.session_state.data_grafico = None
 if 'mostrar_editor' not in st.session_state:
-  st.session_state.mostrar_editor = False
+    st.session_state.mostrar_editor = False
 if 'sigma_hallado' not in st.session_state:
-  st.session_state.sigma_hallado = get_volatility_data_alpha()
+    st.session_state.sigma_hallado = valores_Alpha[1]
 # Ahora iniciamos todas las variables que necesitamos para optimizar
 if 'variable_optimizada' not in st.session_state:
     st.session_state.variable_optimizada = None
