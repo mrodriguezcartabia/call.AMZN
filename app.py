@@ -166,6 +166,7 @@ def get_market_data_alpha():
         data = response.json()
         with st.expander(t["msg_error_api"]):
             st.json(data)
+            st.write(data)
         if "Time Series (Daily)" in data:
             # Extraer precios de cierre
             df = pd.DataFrame.from_dict(data['Time Series (Daily)'], orient='index')
