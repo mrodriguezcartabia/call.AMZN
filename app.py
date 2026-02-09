@@ -179,14 +179,17 @@ def get_market_data_alpha():
             return ultimo_precio, sigma_anual
     except:
         pass
-    if st.session_state.valor_temporal is None:
-        parar_juego(t["parar_precio"])
-        precio = st.session_state.valor_temporal
+    if 'precio' not in st.session_state:
+        if st.session_state.valor_temporal is None:
+            parar_juego(t["parar_precio"])
+        st.session_state.precio = st.session_state.valor_temporal
         st.session_state.valor_temporal = None
-        parar_juego(t["parar_sigma"])
-        sigma_anual = st.session_state.valor_temporal
+    if 'sigma' not in st.session_state:
+        if st.session_state.valor_temporal is None:
+            parar_juego(t["parar_sigma"])
+        st.session_state.sigma = st.session_state.valor_temporal
         st.session_state.valor_temporal = None
-    return precio, sigma_anual
+    return st.session_state.precio, st.session_state.sigma
 
 def get_fred_risk_free_rate():
     cache_file = "risk_free.txt"
@@ -217,47 +220,12 @@ def get_fred_risk_free_rate():
                 return tasa
     except:
         pass
-    if st.session_state.valor_temporal is None:
-        parar_juego(t["parar_tasa"])
-    precio = st.session_state.valor_temporal
-    st.session_state.valor_temporal = None
-    return precio
-
-def get_volatility_data_alpha():
-    cache_file = "volatility_data.txt"
-    # Leamos el archivo
-    if os.path.exists(cache_file):
-        file_age = time.time() - os.path.getmtime(cache_file)
-        if file_age < 21600:
-            try:
-                with open(cache_file, "r") as f:
-                    cached_file = float(f.read())
-                return cached_file
-            except:
-                pass
-    # Buscamos en la web
-    try:
-        api_key = st.secrets["ALPHAVANTAGE_API_KEY"]  
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
-        response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AMZN&apikey={api_key}", headers=headers, timeout=10)
-        data = response.json()
-        if "Time Series (Daily)" in data:
-            # Extraer precios de cierre
-            df = pd.DataFrame.from_dict(data['Time Series (Daily)'], orient='index')
-            df = df['4. close'].astype(float).sort_index()
-            log_returns = np.log(df / df.shift(1)).dropna() # 1. Calcular rendimientos logarítmicos
-            sigma_diario = log_returns.std() # 2. Desviación estándar diaria
-            sigma_anual = sigma_diario * np.sqrt(252) # 3. Anualizar (252 días de trading)
-            with open(cache_file, "w") as f:
-                f.write(str(sigma_anual))
-            return sigma_anual
-    except:
-        pass
-    if st.session_state.valor_temporal is None:
-        parar_juego(t["parar_sigma"])
-    sigma_anual = st.session_state.valor_temporal
-    st.session_state.valor_temporal = None
-    return sigma_anual            
+    if 'tasa' not in st.session_state:
+        if st.session_state.valor_temporal is None:
+            parar_juego(t["parar_tasa"])
+        st.session_state.tasa = st.session_state.valor_temporal
+        st.session_state.valor_temporal = None
+    return st.session_state.tasa
 
 def hallar_sigma_optimo(precios_mercado, strikes, S, r, T, beta, paso, param_a):
     def error_cuadratico(sigma_test):
@@ -342,10 +310,12 @@ def optimizar_parametro(target_param, precios_mercado, strikes, S, r, T, sigma, 
 
 # --- ESTADO DE SESIÓN ---
 valor_paso_original = 1.0
-valores_Alpha = get_market_data_alpha()
 # Creamos una variable que sirve en caso de que falle la comunicación con Alpha v o FRED
+# Cuando vale None activa la función parar_juego
 if 'valor_temporal' not in st.session_state:
     st.session_state.valor_temporal = None
+valores_Alpha = get_market_data_alpha()
+
 if 'tiempo_total' not in st.session_state:
     st.session_state.tiempo_total = 1.0
 if 'precio_AMZN' not in st.session_state:
